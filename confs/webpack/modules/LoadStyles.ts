@@ -135,6 +135,67 @@ export const loadStyles = (
     if (cssPreConfiguration) {
         const { regex, selfLoaderName, selfLoaderOptions } = cssPreConfiguration;
 
+        if (styleType === 'scss') {
+            return confInstance.module
+                .rule(styleType)
+                .test(regex)
+                .oneOf('css-module')
+                .test(/\.module\.\w+$/i)
+                .use('style')
+                .loader(isDev ? 'style-loader' : miniLoader)
+                .end()
+                .use('css')
+                .loader('css-loader')
+                .options(genCssLoaderOption(basicOptGenCssLoaderOption))
+                .end()
+                .use('postcss')
+                .loader('postcss-loader')
+                .options({ sourceMap })
+                .end()
+                .use(styleType)
+                .loader(selfLoaderName)
+                .options(selfLoaderOptions)
+                .end()
+                .use('style-resource')
+                .loader('style-resources-loader')
+                .options({
+                    patterns: Array.isArray(styleResourcePatterns) ? styleResourcePatterns : [],
+                })
+                .end()
+                .end()
+                .oneOf('style-normal')
+                .use('style')
+                .loader(isDev ? 'style-loader' : miniLoader)
+                .end()
+                .use('css')
+                .loader('css-loader')
+                .options(genCssLoaderOption({ isWithCssModule: false, ...basicOptGenCssLoaderOption }))
+                .end()
+                .use('postcss')
+                .loader('postcss-loader')
+                .options({ sourceMap })
+                .end()
+                .use('resolve-url-loader')
+                .loader('resolve-url-loader')
+                .end()
+                .use(styleType)
+                .loader(selfLoaderName)
+                .options({
+                    ...selfLoaderOptions,
+                    sourceMap: true,
+                })
+                .end()
+                .use('style-resource')
+                .loader('style-resources-loader')
+                .options({
+                    patterns: Array.isArray(styleResourcePatterns) ? styleResourcePatterns : [],
+                })
+                .end()
+                .end()
+                .end()
+                .end();
+        }
+
         return confInstance.module
             .rule(styleType)
             .test(regex)
