@@ -2,11 +2,15 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 
-const injected = document.querySelector('#app');
-if (injected) {
-    createRoot(injected).render(
+const main = () => {
+    const appDom = document.querySelector('#app');
+    const rootDom: Element = appDom ? appDom : document.body;
+
+    createRoot(rootDom).render(
         <StrictMode>
             <App />
         </StrictMode>
     );
-}
+};
+
+main();
